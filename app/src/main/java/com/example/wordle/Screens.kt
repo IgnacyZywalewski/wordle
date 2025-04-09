@@ -71,9 +71,10 @@ fun WordleScreen() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(paddingValues)
+                    .padding(top = 35.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                //verticalArrangement = Arrangement.Center
             ) {
                 WordleGrid(wordLength = selectedLength.toInt())
             }
@@ -83,10 +84,10 @@ fun WordleScreen() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 30.dp)
+                    .padding(bottom = 20.dp)
                     .padding(10.dp)
             ) {
-                Keyboard()
+                Keyboard(selectedLanguage)
             }
         },
         containerColor = Color(0xFF121212)

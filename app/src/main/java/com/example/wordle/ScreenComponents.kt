@@ -6,17 +6,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
@@ -30,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -51,7 +45,7 @@ fun DropDownMenu(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 12.dp, end = 12.dp),
+            .padding(end = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Język
@@ -65,7 +59,7 @@ fun DropDownMenu(
                     .fillMaxWidth()
                     .clickable { languageMenuExpanded = true }
                     .background(Color.DarkGray)
-                    .padding(10.dp)
+                    .padding(vertical = 10.dp)
             )
             DropdownMenu(
                 expanded = languageMenuExpanded,
@@ -96,7 +90,7 @@ fun DropDownMenu(
                     .fillMaxWidth()
                     .clickable { lengthMenuExpanded = true }
                     .background(Color.DarkGray)
-                    .padding(10.dp)
+                    .padding(vertical = 10.dp)
             )
             DropdownMenu(
                 expanded = lengthMenuExpanded,
@@ -149,38 +143,45 @@ fun WordleGrid(wordLength: Int) {
 }
 
 @Composable
-fun Keyboard() {
+fun Keyboard(selectedLanguage: String) {
+    val row0 = "ĄĆĘŁÓŚŃŻŹ"
     val row1 = "QWERTYUIOP"
     val row2 = "ASDFGHJKL"
     val row3 = "ZXCVBNM"
-    val row4 = listOf("Enter") + listOf("⌫")
+    val row4 = listOf("Reset") + listOf("Enter") + listOf("⌫")
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        if (selectedLanguage == "Polski") {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                row0.forEach { letter -> KeyboardBox(letter.toString()) }
+            }
+        }
+
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row1.forEach { letter -> KeyboardButton(letter.toString()) }
+            row1.forEach { letter -> KeyboardBox(letter.toString()) }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row2.forEach { letter -> KeyboardButton(letter.toString()) }
+            row2.forEach { letter -> KeyboardBox(letter.toString()) }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row3.forEach { letter -> KeyboardButton(letter.toString()) }
+            row3.forEach { letter -> KeyboardBox(letter.toString()) }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row4.forEach { letter -> KeyboardButton(letter, Modifier.weight(1f)) }
+            row4.forEach { letter -> KeyboardBox(letter, Modifier.weight(1f)) }
         }
     }
 }
 
 @Composable
-fun KeyboardButton(text: String, modifier: Modifier = Modifier) {
-    Button(
-        onClick = {},
+fun KeyboardBox(text: String, modifier: Modifier = Modifier) {
+    Box(
         modifier = modifier
             .padding(3.dp)
-            .widthIn(max = 37.dp)
-            .height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-        shape = RoundedCornerShape(5.dp)
+            .width(37.dp)
+            .height(50.dp)
+            .background(Color.Gray, shape = RoundedCornerShape(5.dp))
+            .clickable {},
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
