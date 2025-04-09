@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,22 +36,25 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun DropDownMenu() {
-    var selectedLanguage by remember { mutableStateOf("Angielski") }
+fun DropDownMenu(
+    selectedLanguage: String,
+    onLanguageSelected: (String) -> Unit,
+    selectedLength: String,
+    onLengthSelected: (String) -> Unit
+) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
     val languageOptions = listOf("Angielski", "Polski")
 
-    var selectedLength by remember { mutableStateOf("5") }
     var lengthMenuExpanded by remember { mutableStateOf(false) }
     val lengthOptions = listOf("4", "5", "6")
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(start = 12.dp, end = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Jezyki
+        // Język
         Box(modifier = Modifier.weight(1f)) {
             Text(
                 selectedLanguage,
@@ -64,13 +69,14 @@ fun DropDownMenu() {
             )
             DropdownMenu(
                 expanded = languageMenuExpanded,
-                onDismissRequest = { languageMenuExpanded = false }
+                onDismissRequest = { languageMenuExpanded = false },
+                modifier = Modifier.background(Color.DarkGray)
             ) {
                 languageOptions.forEach { language ->
                     DropdownMenuItem(
-                        text = { Text(language, fontSize = 15.sp) },
+                        text = { Text(language, fontSize = 20.sp, color = Color.White) },
                         onClick = {
-                            selectedLanguage = language
+                            onLanguageSelected(language)
                             languageMenuExpanded = false
                         }
                     )
@@ -78,9 +84,9 @@ fun DropDownMenu() {
             }
         }
 
-        // Dlugosc slow
+        // Długość słowa
         Box(modifier = Modifier.weight(1f)) {
-            var lengthWord = if(selectedLength.toInt() == 4) "litery" else "liter"
+            val lengthWord = if (selectedLength == "4") "litery" else "liter"
             Text(
                 "$selectedLength $lengthWord",
                 textAlign = TextAlign.Center,
@@ -94,15 +100,15 @@ fun DropDownMenu() {
             )
             DropdownMenu(
                 expanded = lengthMenuExpanded,
-                onDismissRequest = { lengthMenuExpanded = false }
+                onDismissRequest = { lengthMenuExpanded = false },
+                modifier = Modifier.background(Color.DarkGray)
             ) {
                 lengthOptions.forEach { length ->
-                    lengthWord = if(length.toInt() == 4) "litery" else "liter"
-
+                    val word = if (length == "4") "litery" else "liter"
                     DropdownMenuItem(
-                        text = { Text("$length $lengthWord", fontSize = 15.sp) },
+                        text = { Text("$length $word", fontSize = 20.sp, color = Color.White) },
                         onClick = {
-                            selectedLength = length
+                            onLengthSelected(length)
                             lengthMenuExpanded = false
                         }
                     )
@@ -112,8 +118,12 @@ fun DropDownMenu() {
     }
 }
 
+
 @Composable
-fun WordleGrid() {
+fun WordleGrid(wordLength: Int) {
+
+    val boxSize = if (wordLength == 6) 68.dp else 75.dp
+
     Column(modifier = Modifier.fillMaxWidth()) {
         repeat(6) {
             Row(
@@ -122,11 +132,10 @@ fun WordleGrid() {
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                repeat(5) {
+                repeat(wordLength) {
                     Box(
                         modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f)
+                            .size(boxSize)
                             .padding(4.dp)
                             .background(Color.DarkGray, shape = RoundedCornerShape(4.dp)),
                         contentAlignment = Alignment.Center
@@ -167,16 +176,16 @@ fun KeyboardButton(text: String, modifier: Modifier = Modifier) {
     Button(
         onClick = {},
         modifier = modifier
-            .padding(4.dp)
+            .padding(3.dp)
             .widthIn(max = 37.dp)
             .height(50.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-        shape = RoundedCornerShape(6.dp)
+        shape = RoundedCornerShape(5.dp)
     ) {
         Text(
             text = text,
             color = Color.White,
-            fontSize = 16.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
     }
