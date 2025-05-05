@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -114,19 +115,18 @@ fun DropDownMenu(
 
 
 @Composable
-fun WordleGrid(wordLength: Int) {
-
+fun WordleGrid(wordLength: Int, guesses: List<List<Char>>) {
     val boxSize = if (wordLength == 6) 68.dp else 75.dp
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        repeat(6) {
+        guesses.forEach { row ->
             Row(
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                repeat(wordLength) {
+                row.forEach { letter ->
                     Box(
                         modifier = Modifier
                             .size(boxSize)
@@ -134,7 +134,7 @@ fun WordleGrid(wordLength: Int) {
                             .background(Color.DarkGray, shape = RoundedCornerShape(4.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "", fontSize = 24.sp, color = Color.White)
+                        Text(text = letter.toString(), fontSize = 24.sp, color = Color.White)
                     }
                 }
             }
@@ -142,45 +142,47 @@ fun WordleGrid(wordLength: Int) {
     }
 }
 
+
 @Composable
-fun Keyboard(selectedLanguage: String) {
+fun Keyboard(selectedLanguage: String, onKeyClick: (String) -> Unit) {
     val row0 = "ĄĆĘŁÓŚŃŻŹ"
     val row1 = "QWERTYUIOP"
     val row2 = "ASDFGHJKL"
     val row3 = "ZXCVBNM"
-    val row4 = listOf("Reset") + listOf("Enter") + listOf("⌫")
+    val row4 = listOf("Reset", "Enter", "⌫")
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         if (selectedLanguage == "Polski") {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                row0.forEach { letter -> KeyboardBox(letter.toString()) }
+                row0.forEach { letter -> KeyboardBox(letter.toString()) { onKeyClick(letter.toString()) } }
             }
         }
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row1.forEach { letter -> KeyboardBox(letter.toString()) }
+            row1.forEach { letter -> KeyboardBox(letter.toString()) { onKeyClick(letter.toString()) } }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row2.forEach { letter -> KeyboardBox(letter.toString()) }
+            row2.forEach { letter -> KeyboardBox(letter.toString()) { onKeyClick(letter.toString()) } }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row3.forEach { letter -> KeyboardBox(letter.toString()) }
+            row3.forEach { letter -> KeyboardBox(letter.toString()) { onKeyClick(letter.toString()) } }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row4.forEach { letter -> KeyboardBox(letter, Modifier.weight(1f)) }
+            row4.forEach { key -> KeyboardBox(key, Modifier.weight(1f)) { onKeyClick(key) } }
         }
     }
 }
 
+
 @Composable
-fun KeyboardBox(text: String, modifier: Modifier = Modifier) {
+fun KeyboardBox(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
         modifier = modifier
             .padding(3.dp)
             .width(37.dp)
             .height(50.dp)
             .background(Color.Gray, shape = RoundedCornerShape(5.dp))
-            .clickable {},
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
