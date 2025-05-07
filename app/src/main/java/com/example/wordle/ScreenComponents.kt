@@ -2,25 +2,12 @@ package com.example.wordle
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 
 @Composable
 fun DropDownMenu(
@@ -113,28 +99,35 @@ fun DropDownMenu(
     }
 }
 
-
 @Composable
-fun WordleGrid(wordLength: Int, guesses: List<List<Char>>) {
+fun WordleGrid(wordLength: Int, guesses: List<List<Char>>, rowColors: Map<Int, List<Color>>) {
     val boxSize = if (wordLength == 6) 68.dp else 75.dp
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        guesses.forEach { row ->
-            Row(
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                row.forEach { letter ->
-                    Box(
-                        modifier = Modifier
-                            .size(boxSize)
-                            .padding(4.dp)
-                            .background(Color.DarkGray, shape = RoundedCornerShape(4.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = letter.toString(), fontSize = 24.sp, color = Color.White)
+    key(wordLength) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            guesses.forEachIndexed { rowIndex, row ->
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    row.forEachIndexed { colIndex, letter ->
+                        val color = rowColors[rowIndex]?.getOrNull(colIndex) ?: Color.DarkGray
+                        Box(
+                            modifier = Modifier
+                                .size(boxSize)
+                                .padding(4.dp)
+                                .background(color, shape = RoundedCornerShape(4.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = letter.toString(),
+                                fontSize = 24.sp,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
@@ -144,7 +137,11 @@ fun WordleGrid(wordLength: Int, guesses: List<List<Char>>) {
 
 
 @Composable
-fun Keyboard(selectedLanguage: String, onKeyClick: (String) -> Unit) {
+fun Keyboard(
+    selectedLanguage: String,
+    keyboardColors: Map<String, Color>,
+    onKeyClick: (String) -> Unit
+) {
     val row0 = "ĄĆĘŁÓŚŃŻŹ"
     val row1 = "QWERTYUIOP"
     val row2 = "ASDFGHJKL"
@@ -154,34 +151,30 @@ fun Keyboard(selectedLanguage: String, onKeyClick: (String) -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         if (selectedLanguage == "Polski") {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                row0.forEach { letter -> KeyboardBox(letter.toString()) { onKeyClick(letter.toString()) } }
+                row0.forEach { letter -> KeyboardBox(letter.toString(), keyboardColors[letter.toString()] ?: Color.Gray) { onKeyClick(letter.toString()) } }
+            }
+        }
+
+        listOf(row1, row2, row3).forEach { row ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                row.forEach { letter -> KeyboardBox(letter.toString(), keyboardColors[letter.toString()] ?: Color.Gray) { onKeyClick(letter.toString()) } }
             }
         }
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row1.forEach { letter -> KeyboardBox(letter.toString()) { onKeyClick(letter.toString()) } }
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row2.forEach { letter -> KeyboardBox(letter.toString()) { onKeyClick(letter.toString()) } }
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row3.forEach { letter -> KeyboardBox(letter.toString()) { onKeyClick(letter.toString()) } }
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            row4.forEach { key -> KeyboardBox(key, Modifier.weight(1f)) { onKeyClick(key) } }
+            row4.forEach { key -> KeyboardBox(key, Color.Gray, Modifier.weight(1f)) { onKeyClick(key) } }
         }
     }
 }
 
-
 @Composable
-fun KeyboardBox(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun KeyboardBox(text: String, color: Color, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
         modifier = modifier
             .padding(3.dp)
             .width(37.dp)
             .height(50.dp)
-            .background(Color.Gray, shape = RoundedCornerShape(5.dp))
+            .background(color, shape = RoundedCornerShape(5.dp))
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
